@@ -1,0 +1,22 @@
+<<<<<<< HEAD
+Flask
+Gunicorn
+jsonify
+flask-cors
+pymongo
+Flask-PyMongo
+certifi
+twilio
+# dotenv
+=======
+Flask
+Gunicorn
+jsonify
+flask-cors
+pymongo
+Flask-PyMongo
+certifi
+twilio
+# dotenv
+>>>>>>> 185adc8d3ea814579f028c25aad177d98e794ed4
+flask-session
