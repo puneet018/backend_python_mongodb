@@ -50,10 +50,16 @@ def check_user():
 
 
 # OTP authentication confrigration
-account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-verify_sid = os.getenv("VERIFY_SID")
-from_number = os.getenv("TWILIO_NUMBER")
+# account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+# auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+# verify_sid = os.getenv("VERIFY_SID")
+# from_number = os.getenv("TWILIO_NUMBER")
+
+account_sid = "ACe153842b9f2450d2a72c5f7386220822"
+auth_token = "0f17e7fe12b1ae7ef3ac15b9a8d4e73b"
+verify_sid = "f7f8e9eac96a31ff711866808e29d3a9"
+from_number = "+15706825138"
+
 client = Client(account_sid,auth_token)
 
 # Route to create a new user
