@@ -2,7 +2,6 @@ from flask import Flask, request, Response, session
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
-# from dotenv import load_dotenv
 from jsonify import convert
 import os
 
@@ -14,26 +13,19 @@ app.secret_key = b'NjYgNmMgNjEgNzMgNmIgNjMgNmYgNjQgNjU='
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# Sample data to serve
-# def endpoint():
-# 	results_bulk_iter = iter([])
-# 	response = Response(stream_with_context(bulk_update_streamed_response(results_bulk_iter)),
-# 					mimetype='text/plain')
-# 	return response
-
-# def bulk_update_streamed_response(results):
-# 	for updated, _ in results:
-# 		yield str(counter).decode('utf-8')
-            
-
+# DATABASE connection
 client = pymongo.MongoClient('mongodb+srv://shivams:shivams@cluster0.jc8u7cz.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=Cluster0')
 userdb = client['FlaskDB']
 users = userdb.users
+properties = userdb.properties
+
+otp_status = ''
 
 # Route to get all users
 @app.route('/users', methods=['GET', 'POST'])
 def get_users():
-	return "data"
+	user_data = users.find()
+	return user_data
 
 @app.route('/insert', methods=['POST', 'GET'])
 @cross_origin()
@@ -48,10 +40,8 @@ def insert_data():
 		# 	return "False"
 
 def check_user():
-
 	if request.method == 'POST':
 		user = request.get_json()
-
 		user_data = users.find_one(user)
 		if user_data == None:
 			return False, ""
@@ -66,40 +56,62 @@ verify_sid = os.getenv("VERIFY_SID")
 from_number = os.getenv("TWILIO_NUMBER")
 client = Client(account_sid,auth_token)
 
-# # Route to create a new user
+# Route to create a new user
 @app.route('/create_user', methods=['POST'])
 def create_user():
+
 	new_user = request.get_json()
-	# if name != '':
-	_id = users.insert_one(new_user)
-	number = new_user['number']
+	find_user = users.find_one(new_user)
+	mobile_number = new_user['mobile_number']
 	userName = new_user['name']
 
+	if find_user == None:
+		# new user insert
+		_id = users.insert_one(new_user)
+	# else:
+		# old user forward to login
 	# sending opt for verification of user
-	status  = send_otp_via_sms(number, userName)
+	status  = send_otp_via_sms(mobile_number)
 	return status
 
-def send_otp_via_sms(number, userName):
-	# massage = client.messages.create(body="Hello world", from_=from_number,
-	#   to=number)
-	
-	otp_verification = client.verify.services(verify_sid).verifications.create(
-	 to=number, channel="sms")
-	session['number'] = number
+@app.route('/login_user', methods=['POST'])
+def login_user():
+	user = request.get_json()
+	mobile_number = user['mobile_number']
+	# sending opt for verification of user
+	status  = send_otp_via_sms(mobile_number)
+	if otp_status == 'approved':
+		find_user = users.find_one(mobile_number)
+	return find_user
 
-	return otp_verification.status
-	# code = 123012
-# messages = client.messages.create(to=number, from_=from_number, body=f"Hello "+userName+" Your one-time password is "+code)
-# print(messages)
+def send_otp_via_sms(mobile_number):
+	code = 123012
+	session['code'] = code
+	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
+	# otp_verification = client.verify.services(verify_sid).verifications.create(
+	#  to = mobile_number, channel="sms")
+	session['mobile_number'] = mobile_number
+	return massage.status
 
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
-	otp_check = client.verify.services(verify_sid).verification_checks.create(
-		to=session['number'], code=verify_data['otp_code']
-	)
-	return otp_check.status
+	if session['code'] == int(verify_data['otp_code']):
+		otp_status = "approved"
+	else:
+		otp_status = "not approved"
+	# otp_check = client.verify.services(verify_sid).verification_checks.create(
+	# 	to=session['mobile_number'], code=verify_data['otp_code']
+	# )
+	# otp_status = otp_check.status
 
+	return otp_status
+
+@app.route('/property_save', methods=['POST'])
+def property_save():
+	property_data = request.get_json()
+	_id = properties.insert_one(property_data)
+	return 
 
 
 # Route to get a user by ID
