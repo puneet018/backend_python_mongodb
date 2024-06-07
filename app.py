@@ -57,7 +57,7 @@ def check_user():
 
 account_sid = "ACe153842b9f2450d2a72c5f7386220822"
 auth_token = "0f17e7fe12b1ae7ef3ac15b9a8d4e73b"
-verify_sid = "f7f8e9eac96a31ff711866808e29d3a9"
+verify_sid = "0eba6e77b35e180a6445df492101e554"
 from_number = "+15706825138"
 
 client = Client(account_sid,auth_token)
