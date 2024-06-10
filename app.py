@@ -1,8 +1,10 @@
-from flask import Flask, request, Response, session
+from flask import Flask, request, Response, session, jsonify
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
-from jsonify import convert
+import json
+from bson import ObjectId
+# from jsonify import convert
 import os
 
 app = Flask(__name__)
@@ -20,6 +22,15 @@ users = userdb.users
 properties = userdb.properties
 
 otp_status = ''
+
+
+# Custom JSON Encoder to handle ObjectId
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super().default(o)
+
 
 # Route to get all users
 @app.route('/users', methods=['GET', 'POST'])
@@ -56,8 +67,8 @@ def check_user():
 # from_number = os.getenv("TWILIO_NUMBER")
 
 account_sid = "ACe153842b9f2450d2a72c5f7386220822"
-auth_token = "0f17e7fe12b1ae7ef3ac15b9a8d4e73b"
-verify_sid = "0eba6e77b35e180a6445df492101e554"
+auth_token = "0eba6e77b35e180a6445df492101e554"
+verify_sid = "f7f8e9eac96a31ff711866808e29d3a9"
 from_number = "+15706825138"
 
 client = Client(account_sid,auth_token)
@@ -67,10 +78,10 @@ client = Client(account_sid,auth_token)
 def create_user():
 
 	new_user = request.get_json()
-	find_user = users.find_one(new_user)
+	find_user = users.find_one({"mobile_number":new_user['mobile_number']})
 	mobile_number = new_user['mobile_number']
 	userName = new_user['name']
-
+	print(find_user)
 	if find_user == None:
 		# new user insert
 		_id = users.insert_one(new_user)
@@ -78,17 +89,17 @@ def create_user():
 		# old user forward to login
 	# sending opt for verification of user
 	status  = send_otp_via_sms(mobile_number)
-	return status
+	return 'status'
 
 @app.route('/login_user', methods=['POST'])
 def login_user():
 	user = request.get_json()
 	mobile_number = user['mobile_number']
 	# sending opt for verification of user
-	status  = send_otp_via_sms(mobile_number)
-	if otp_status == 'approved':
-		find_user = users.find_one(mobile_number)
-	return find_user
+	status = send_otp_via_sms(mobile_number)
+	# if otp_status == 'approved':
+	# find_user = users.find_one(mobile_number)
+	return status
 
 def send_otp_via_sms(mobile_number):
 	code = 123012
@@ -99,19 +110,29 @@ def send_otp_via_sms(mobile_number):
 	session['mobile_number'] = mobile_number
 	return massage.status
 
+
+# Sample MongoDB document with ObjectId
+
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
 	if session['code'] == int(verify_data['otp_code']):
-		otp_status = "approved"
+		# otp_status = "approved"
+		print(session['mobile_number'])
+		data = users.find_one({"mobile_number":session['mobile_number']})
+		print(data)
+				# Serialize the document using the custom encoder
+		data = json.dumps(data, cls=JSONEncoder)
+		print(data)
+		session['code']=None
 	else:
-		otp_status = "not approved"
+		data = "not approved"
 	# otp_check = client.verify.services(verify_sid).verification_checks.create(
 	# 	to=session['mobile_number'], code=verify_data['otp_code']
 	# )
 	# otp_status = otp_check.status
 
-	return otp_status
+	return jsonify(data)
 
 @app.route('/property_save', methods=['POST'])
 def property_save():
