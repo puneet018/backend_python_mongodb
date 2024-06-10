@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
 import json
 from bson import ObjectId
+from configparser import ConfigParser
 # from jsonify import convert
 import os
 
@@ -67,10 +68,13 @@ def check_user():
 # from_number = os.getenv("TWILIO_NUMBER")
 
 account_sid = "ACe153842b9f2450d2a72c5f7386220822"
-auth_token = "0eba6e77b35e180a6445df492101e554"
 verify_sid = "f7f8e9eac96a31ff711866808e29d3a9"
 from_number = "+15706825138"
 
+config = ConfigParser()
+config.read('config.ini')
+auth_token = config.get('auth', 'token')
+print(auth_token)
 client = Client(account_sid,auth_token)
 
 # Route to create a new user
