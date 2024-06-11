@@ -2,7 +2,7 @@ from flask import Flask, request, Response, session, jsonify
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
-import json
+import json, random
 from bson import ObjectId
 from configparser import ConfigParser
 # from jsonify import convert
@@ -62,25 +62,18 @@ def check_user():
 
 
 # OTP authentication confrigration
-# account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-# auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-# verify_sid = os.getenv("VERIFY_SID")
-# from_number = os.getenv("TWILIO_NUMBER")
-
-account_sid = "ACe153842b9f2450d2a72c5f7386220822"
-verify_sid = "f7f8e9eac96a31ff711866808e29d3a9"
-from_number = "+15706825138"
-
+# twilio setting
 config = ConfigParser()
 config.read('config.ini')
 auth_token = config.get('auth', 'token')
-print(auth_token)
+account_sid = config.get('auth', 'account_sid')
+verify_sid = config.get('auth', 'verify_sid')
+from_number = config.get('auth', 'from_number')
 client = Client(account_sid,auth_token)
 
-# Route to create a new user
+# create a new user
 @app.route('/create_user', methods=['POST'])
 def create_user():
-
 	new_user = request.get_json()
 	find_user = users.find_one({"mobile_number":new_user['mobile_number']})
 	mobile_number = new_user['mobile_number']
@@ -95,6 +88,7 @@ def create_user():
 	status  = send_otp_via_sms(mobile_number)
 	return 'status'
 
+# login user with otp
 @app.route('/login_user', methods=['POST'])
 def login_user():
 	user = request.get_json()
@@ -105,45 +99,60 @@ def login_user():
 	# find_user = users.find_one(mobile_number)
 	return status
 
+# send otp to user number
 def send_otp_via_sms(mobile_number):
-	code = 123012
+	code = random.randint(100000, 999999)
 	session['code'] = code
+	session['mobile_number'] = mobile_number
 	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
-	session['mobile_number'] = mobile_number
 	return massage.status
 
 
-# Sample MongoDB document with ObjectId
-
+# check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
-	if session['code'] == int(verify_data['otp_code']):
-		# otp_status = "approved"
-		print(session['mobile_number'])
-		data = users.find_one({"mobile_number":session['mobile_number']})
-		print(data)
-				# Serialize the document using the custom encoder
-		data = json.dumps(data, cls=JSONEncoder)
-		print(data)
-		session['code']=None
-	else:
-		data = "not approved"
+	try:
+		if session['code'] == int(verify_data['otp_code']):
+			# otp_status = "approved"
+			print(session['mobile_number'])
+			data = users.find_one({"mobile_number":session['mobile_number']})
+			print(data)
+					# Serialize the document using the custom encoder
+			data = json.dumps(data, cls=JSONEncoder)
+			print(data)
+			session['code']=None
+		else:
+			data = "not approved"
+	except (BaseException) as e:
+		return jsonify({"status_code": 500, "message": str(e)})
 	# otp_check = client.verify.services(verify_sid).verification_checks.create(
 	# 	to=session['mobile_number'], code=verify_data['otp_code']
 	# )
 	# otp_status = otp_check.status
-
 	return jsonify(data)
 
+# Store property data 
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	property_data = request.get_json()
-	_id = properties.insert_one(property_data)
-	return 
+	try:
+		_id = properties.insert_one(property_data)
+		response_data = jsonify({'status_code': 200, 'status_msg': 'Data saved'})
+	except (BaseException) as e:
+		response_data = jsonify({"status_code": 500, "message": str(e)})
+	return response_data
 
+# Get properties data 
+@app.route('/properties_get', methods=['GET'])
+def properties_get():
+	try:
+		response_data = jsonify({'status_code': 200, 'data': properties.find()})
+	except (BaseException) as e:
+		response_data = jsonify({"status_code": 500, "message": str(e)})
+	return response_data
 
 # Route to get a user by ID
 # @app.route('/users/<int:user_id>', methods=['GET'])
