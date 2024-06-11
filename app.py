@@ -125,7 +125,7 @@ def check_otp():
 			print(data)
 			session['code']=None
 		else:
-			data = "not approved"
+			return jsonify({'status_code':500, 'message' : 'not approved'})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	# otp_check = client.verify.services(verify_sid).verification_checks.create(
