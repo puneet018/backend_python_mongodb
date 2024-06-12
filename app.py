@@ -107,7 +107,7 @@ def send_otp_via_sms(mobile_number):
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
-	return code
+	return jsonify(code)
 
 
 # check OTP
