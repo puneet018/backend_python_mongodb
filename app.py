@@ -102,12 +102,12 @@ def login_user():
 # send otp to user number
 def send_otp_via_sms(mobile_number):
 	code = random.randint(100000, 999999)
-	session['code'] = 111000
+	session['code'] = code
 	session['mobile_number'] = mobile_number
 	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
-	return 'massage.status'
+	return massage.status
 
 
 # check OTP
