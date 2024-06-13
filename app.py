@@ -98,13 +98,12 @@ def login_user():
 	# if otp_status == 'approved':
 	# find_user = users.find_one(mobile_number)
 	return status
-session['code']
 # send otp to user number
 def send_otp_via_sms(mobile_number):
 	code = random.randint(100000, 999999)
 	session['code'] = code
 	session['mobile_number'] = mobile_number
-	app.logger.info(f'Session set: {session['code']}')
+	app.logger.info(f'Session set: {session["code"]}')
 	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
@@ -126,7 +125,7 @@ def check_otp():
 	verify_data = request.get_json()
 	try:
 		print('outside if ------------')
-		print(session['code'])
+		# print(session['code'])
 		print('code' in session)
 		if 'code' in session:
 			print('inside if ------------')
