@@ -104,10 +104,10 @@ def send_otp_via_sms(mobile_number):
 	code = random.randint(100000, 999999)
 	session['code'] = code
 	session['mobile_number'] = mobile_number
-	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
+	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
-	return massage.status
+	return jsonify({'code':code,'status':200})
 
 
 # check OTP
@@ -115,8 +115,13 @@ def send_otp_via_sms(mobile_number):
 def check_otp():
 	verify_data = request.get_json()
 	try:
-
+		print('outside if ------------')
+		print('code' in session)
 		if 'code' in session:
+			print('inside if ------------')
+			print(session['code'])
+			temp = int(verify_data['otp_code'])
+			print(temp)
 			if session['code'] == int(verify_data['otp_code']):
 				# otp_status = "approved"
 				data = users.find_one({"mobile_number":session['mobile_number']})
@@ -124,7 +129,7 @@ def check_otp():
 				data = json.dumps(data, cls=JSONEncoder)
 				session.pop('code', None)
 			else:
-				return jsonify({'status_code':500, 'message' : "wrong OTP"})
+				return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
 		else:
 			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
