@@ -117,9 +117,9 @@ def send_otp_via_sms(mobile_number):
 	# return response
 # { "status": 404, "statusText": "Not Found", "message": "The requested resource could not be found.",
 #   "error": { "timestamp": "2024-06-13T10:00:00Z", "path": "/api/resource", "details": "No resource found at the specified path." } }
-	response = {"HttpErrorResponse" : {"status": 200,
-			  "error": "otp send", "message": massage.status, "path": request.path, "details": { "method": request.method, "requestId": request.headers.get("X-Request-ID", "unknown")} } } 
-	return jsonify(response), 200
+	# response = {"HttpErrorResponse" : {"status": 200,
+	# 		  "error": "otp send", "message": massage.status, "path": request.path, "details": { "method": request.method, "requestId": request.headers.get("X-Request-ID", "unknown")} } } 
+	return massage.status
 # check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
