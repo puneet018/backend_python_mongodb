@@ -107,15 +107,14 @@ def send_otp_via_sms(mobile_number):
 	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
-	 # Create a response
-	response = jsonify(message="Hello, World!")
-    
+	# Create a response
+	response = jsonify(massage.status)    
     # Set custom headers
 	response.headers['X-Custom-Header'] = 'CustomHeaderValue'
 	response.headers['Content-Type'] = 'application/json'
-	response.headers['status'] = 'application/json'
+	response.headers['status'] = 200
 	# return jsonify({'code':code,'status':200})
-	return massage.status
+	return response
 # { "status": 404, "statusText": "Not Found", "message": "The requested resource could not be found.",
 #   "error": { "timestamp": "2024-06-13T10:00:00Z", "path": "/api/resource", "details": "No resource found at the specified path." } }
 
