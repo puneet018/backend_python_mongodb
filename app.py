@@ -105,6 +105,7 @@ def send_otp_via_sms(mobile_number):
 	session.permanent = True
 	code = random.randint(100000, 999999)
 	session['code'] = 121212
+	# g.code = 
 	session['mobile_number'] = mobile_number
 	app.logger.info(f'Session set: {session["code"]}')
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
