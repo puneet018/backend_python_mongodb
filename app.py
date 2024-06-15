@@ -101,10 +101,10 @@ def login_user():
 # send otp to user number
 def send_otp_via_sms(mobile_number):
 	code = random.randint(100000, 999999)
-	session['code'] = code
+	session['code'] = 121212
 	session['mobile_number'] = mobile_number
 	app.logger.info(f'Session set: {session["code"]}')
-	massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
+	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")
 	# Create a response
@@ -119,23 +119,23 @@ def send_otp_via_sms(mobile_number):
 #   "error": { "timestamp": "2024-06-13T10:00:00Z", "path": "/api/resource", "details": "No resource found at the specified path." } }
 	# response = {"HttpErrorResponse" : {"status": 200,
 	# 		  "error": "otp send", "message": massage.status, "path": request.path, "details": { "method": request.method, "requestId": request.headers.get("X-Request-ID", "unknown")} } } 
-	return massage.status
+	return 'massage.status'
 # check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
 	try:
 		print('outside if ------------')
-		# print(session['code'])
-		print('code' in session)
-		if 'code' in session:
+		print(session.get('code'))
+		print(session.get('code') != None)
+		if session.get('code') != None:
 			print('inside if ------------')
-			print(session['code'])
+			print(session.get('code'))
 			temp = int(verify_data['otp_code'])
 			print(temp)
-			if session['code'] == int(verify_data['otp_code']):
+			if session.get('code') == int(verify_data['otp_code']):
 				# otp_status = "approved"
-				data = users.find_one({"mobile_number":session['mobile_number']})
+				data = users.find_one({"mobile_number":session.get('mobile_number')})
 				# Serialize the document using the custom encoder
 				data = json.dumps(data, cls=JSONEncoder)
 				session.pop('code', None)
