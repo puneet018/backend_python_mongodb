@@ -5,12 +5,14 @@ from twilio.rest import Client
 import json, random
 from bson import ObjectId
 from configparser import ConfigParser
+from datetime import timedelta
 # from jsonify import convert
 import os
 
 app = Flask(__name__)
 
 app.secret_key = b'NjYgNmMgNjEgNzMgNmIgNjMgNmYgNjQgNjU='
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 # app.config["MONGO_URI"] = "mongodb+srv://nikkyvishwa90:nikkyvishwa90@cluster0.jc8u7cz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/sample_mflix"
 # db = PyMongo(app).db
 cors = CORS(app)
@@ -100,6 +102,7 @@ def login_user():
 	return status
 # send otp to user number
 def send_otp_via_sms(mobile_number):
+	session.permanent = True
 	code = random.randint(100000, 999999)
 	session['code'] = 121212
 	session['mobile_number'] = mobile_number
