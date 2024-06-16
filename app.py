@@ -6,17 +6,12 @@ import json, random
 from bson import ObjectId
 from configparser import ConfigParser
 from datetime import timedelta
-# from jsonify import convert
 import os
-# import firebase_admin
-# from firebase_admin import credentials
 
-# cred = credentials.Certificate("path/to/serviceAccountKey.json")
-# firebase_admin.initialize_app(cred)
 
 
 app = Flask(__name__)
-os.urandom(...)
+
 app.secret_key = b'mynameisnick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 # app.config["MONGO_URI"] = "mongodb+srv://nikkyvishwa90:nikkyvishwa90@cluster0.jc8u7cz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/sample_mflix"
