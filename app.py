@@ -8,10 +8,16 @@ from configparser import ConfigParser
 from datetime import timedelta
 # from jsonify import convert
 import os
+import firebase_admin
+from firebase_admin import credentials
+
+cred = credentials.Certificate("path/to/serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+
 
 app = Flask(__name__)
-
-app.secret_key = b'NjYgNmMgNjEgNzMgNmIgNjMgNmYgNjQgNjU='
+os.urandom(...)
+app.secret_key = b'mynameisnick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 # app.config["MONGO_URI"] = "mongodb+srv://nikkyvishwa90:nikkyvishwa90@cluster0.jc8u7cz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/sample_mflix"
 # db = PyMongo(app).db
@@ -110,7 +116,8 @@ def send_otp_via_sms(mobile_number):
 	app.logger.info(f'Session set: {session["code"]}')
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
-	#  to = mobile_number, channel="sms")
+	#  to = mobile_number, channel="sms")npm install -g firebase-tools
+
 	# Create a response
 	# response = jsonify({"status": 404, })    
     # # Set custom headers
