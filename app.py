@@ -12,7 +12,7 @@ import os
 
 app = Flask(__name__)
 
-app.secret_key = b'mynameisnick'
+app.secret_key = 'mynameisnick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 # app.config["MONGO_URI"] = "mongodb+srv://nikkyvishwa90:nikkyvishwa90@cluster0.jc8u7cz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/sample_mflix"
 # db = PyMongo(app).db
@@ -112,33 +112,19 @@ def send_otp_via_sms(mobile_number):
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")npm install -g firebase-tools
-
-	# Create a response
-	# response = jsonify({"status": 404, })    
-    # # Set custom headers
-	# response.headers['X-Custom-Header'] = 'CustomHeaderValue'
-	# response.headers['Content-Type'] = 'application/json'
-	# response.headers['status'] = 200
-	# # return jsonify({'code':code,'status':200})
-	# return response
-# { "status": 404, "statusText": "Not Found", "message": "The requested resource could not be found.",
-#   "error": { "timestamp": "2024-06-13T10:00:00Z", "path": "/api/resource", "details": "No resource found at the specified path." } }
-	# response = {"HttpErrorResponse" : {"status": 200,
-	# 		  "error": "otp send", "message": massage.status, "path": request.path, "details": { "method": request.method, "requestId": request.headers.get("X-Request-ID", "unknown")} } } 
+	print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
 	return 'massage.status'
+
 # check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
 	try:
-		print('outside if ------------')
-		print(session.get('code'))
+		print(session)
+		print(str(session.get('code'))+str('-------check_otp-------'))
 		print(session.get('code') != None)
 		if session.get('code') != None:
-			print('inside if ------------')
-			print(session.get('code'))
 			temp = int(verify_data['otp_code'])
-			print(temp)
 			if session.get('code') == int(verify_data['otp_code']):
 				# otp_status = "approved"
 				data = users.find_one({"mobile_number":session.get('mobile_number')})
@@ -151,59 +137,82 @@ def check_otp():
 			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
-	# otp_check = client.verify.services(verify_sid).verification_checks.create(
-	# 	to=session['mobile_number'], code=verify_data['otp_code']
-	# )
-	# otp_status = otp_check.status
 	return jsonify(data)
 
 # Store property data 
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	property_data = request.get_json()
+# 	property_data = {
+#     "address": "address1",
+#     "description": "longText",
+#     "name": "Homemaker Grande A",
+#     "type": PropertyType.residential,
+#     "position": {
+#       "lat": 8.948677279926585,
+#       "lng": 125.5470567303216,
+#     },
+#     "price": 210000,
+#     "images": "images1",
+#     "updatedAt": Date(),
+#     "enquiries": ['12'],
+#     "currency": "PHP",
+#     "features": ['Item 1', 'Item 2', 'Item 3', 'Item 4'],
+#     "user_id": '01',
+#   }
 	try:
 		_id = properties.insert_one(property_data)
-		response_data = jsonify({'status_code': 200, 'status_msg': 'Data saved'})
+		response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 	except (BaseException) as e:
-		response_data = jsonify({"status_code": 500, "message": str(e)})
+		response_data = jsonify({"status": 404, "message": str(e)})
 	return response_data
 
 # Get properties data 
 @app.route('/properties_get', methods=['GET'])
 def properties_get():
 	try:
-		response_data = jsonify({'status_code': 200, 'data': properties.find()})
+		response_data = jsonify({'status': 200, 'data': properties.find()})
 	except (BaseException) as e:
-		response_data = jsonify({"status_code": 500, "message": str(e)})
+		response_data = jsonify({"status": 404, "message": str(e)})
 	return response_data
 
+# Get properties data 
+@app.route('/properties_get/<int:property_id>', methods=['GET'])
+def property_get(property_id):
+	try:
+		response_data = jsonify({'status': 200, 'data': properties.find_one(property_id)})
+	except (BaseException) as e:
+		response_data = jsonify({"status": 404, "message": str(e)})
+	return response_data
+
+
 # Route to get a user by ID
-# @app.route('/users/<int:user_id>', methods=['GET'])
-# def get_user(user_id):
-#     user = next((u for u in data if u['id'] == user_id), None)
-#     if user:
-#         return jsonify(user)
-#     else:
-#         return jsonify({'error': 'User not found'}), 404
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = next((u for u in data if u['id'] == user_id), None)
+    if user:
+        return jsonify(user)
+    else:
+        return jsonify({'error': 'User not found'}), 404
 
 
 # # Route to update a user by ID
-# @app.route('/users/<int:user_id>', methods=['PUT'])
-# def update_user(user_id):
-#     user = next((u for u in data if u['id'] == user_id), None)
-#     if user:
-#         updates = request.get_json()
-#         user.update(updates)
-#         return jsonify(user)
-#     else:
-#         return jsonify({'error': 'User not found'}), 404
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    user = next((u for u in data if u['id'] == user_id), None)
+    if user:
+        updates = request.get_json()
+        user.update(updates)
+        return jsonify(user)
+    else:
+        return jsonify({'error': 'User not found'}), 404
 
 # # Route to delete a user by ID
-# @app.route('/users/<int:user_id>', methods=['DELETE'])
-# def delete_user(user_id):
-#     global data
-#     data = [u for u in data if u['id'] != user_id]
-#     return '', 204
+@app.route('/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    global data
+    data = [u for u in data if u['id'] != user_id]
+    return '', 204
 
 if __name__ == '__main__':
     app.run(debug=True)
