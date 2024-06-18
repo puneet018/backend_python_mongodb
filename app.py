@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, session, jsonify
+from flask import Flask, request, Response, session, jsonify, make_response
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
@@ -80,27 +80,44 @@ def create_user():
 	new_user = request.get_json()
 	find_user = users.find_one({"mobile_number":new_user['mobile_number']})
 	mobile_number = new_user['mobile_number']
-	userName = new_user['name']
+	# full_name = new_user['full_name']
 	print(find_user)
 	if find_user == None:
 		# new user insert
 		_id = users.insert_one(new_user)
+	else:
+		return 'already registered'
+	# sending opt for verification of user
+	# status  = send_otp_via_sms(mobile_number)
+	return 'done'
+
+def create_login_user(mobile_number):
+	new_user = request.get_json()
+	new_user['mobile_number'] = mobile_number
+	# full_name = new_user['full_name']
+	# new user insert
+	_id = users.insert_one(new_user)
 	# else:
 		# old user forward to login
 	# sending opt for verification of user
 	status  = send_otp_via_sms(mobile_number)
-	return 'status'
 
 # login user with otp
 @app.route('/login_user', methods=['POST'])
 def login_user():
 	user = request.get_json()
 	mobile_number = user['mobile_number']
+	find_user = users.find_one({"mobile_number":mobile_number})
+	if find_user == None:
+		create_login_user(mobile_number)
+	else:
+		status = send_otp_via_sms(mobile_number)
 	# sending opt for verification of user
-	status = send_otp_via_sms(mobile_number)
+	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
 	# find_user = users.find_one(mobile_number)
 	return status
+
 # send otp to user number
 def send_otp_via_sms(mobile_number):
 	session.permanent = True
@@ -108,6 +125,7 @@ def send_otp_via_sms(mobile_number):
 	session['code'] = 121212
 	# g.code = 
 	session['mobile_number'] = mobile_number
+	
 	app.logger.info(f'Session set: {session["code"]}')
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
@@ -115,11 +133,22 @@ def send_otp_via_sms(mobile_number):
 	print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
 	return 'massage.status'
 
+def set_cookie():
+    # resp = make_response("Setting a cookie!")
+    # resp.set_cookie('SecureCookieSession',{'_permanent': True, 'code': code, 'mobile_number': mobile_number})
+	cookies = {'session': '17ab96bd8ffbe8ca58a78657a918558'}
+	request_set = request.post('backend-python-mongodb.onrender.com', cookies=cookies)
+	return request_set
+
+
 # check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	verify_data = request.get_json()
 	try:
+		# set_cookie()
+		
+		print(request.cookies.get('session'))
 		print(session)
 		print(str(session.get('code'))+str('-------check_otp-------'))
 		print(session.get('code') != None)
