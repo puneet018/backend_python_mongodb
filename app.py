@@ -118,56 +118,67 @@ def login_user():
 	# find_user = users.find_one(mobile_number)
 	return status
 
+
+# Define the global variable
+g_code = 0
+g_mobile_number = None
+
 # send otp to user number
 def send_otp_via_sms(mobile_number):
-	session.permanent = True
+	# session.permanent = True
+	global g_code
+	global g_mobile_number
 	code = random.randint(100000, 999999)
-	session['code'] = 121212
-	# g.code = 
-	session['mobile_number'] = mobile_number
-	
-	app.logger.info(f'Session set: {session["code"]}')
+	# session['code'] = 121212
+	g_code = 121212
+	# session['mobile_number'] = mobile_number
+	g_mobile_number = mobile_number
+	# app.logger.info(f'Session set: {session["code"]}')
 	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")npm install -g firebase-tools
-	print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
+	# print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
 	return 'massage.status'
 
-def set_cookie():
-    # resp = make_response("Setting a cookie!")
-    # resp.set_cookie('SecureCookieSession',{'_permanent': True, 'code': code, 'mobile_number': mobile_number})
-	cookies = {'session': '17ab96bd8ffbe8ca58a78657a918558'}
-	request_set = request.post('backend-python-mongodb.onrender.com', cookies=cookies)
-	return request_set
+# def set_cookie():
+#     # resp = make_response("Setting a cookie!")
+#     # resp.set_cookie('SecureCookieSession',{'_permanent': True, 'code': code, 'mobile_number': mobile_number})
+# 	cookies = {'session': '17ab96bd8ffbe8ca58a78657a918558'}
+# 	request_set = request.post('backend-python-mongodb.onrender.com', cookies=cookies)
+# 	return request_set
+
+
 
 
 # check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
+	global g_code, g_mobile_number
 	verify_data = request.get_json()
 	try:
 		# set_cookie()
-		
-		print(request.cookies.get('session'))
-		print(session)
-		print(str(session.get('code'))+str('-------check_otp-------'))
-		print(session.get('code') != None)
-		if session.get('code') != None:
-			temp = int(verify_data['otp_code'])
-			if session.get('code') == int(verify_data['otp_code']):
-				# otp_status = "approved"
-				data = users.find_one({"mobile_number":session.get('mobile_number')})
-				# Serialize the document using the custom encoder
-				data = json.dumps(data, cls=JSONEncoder)
-				session.pop('code', None)
-			else:
-				return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
+		# print(request.cookies.get('session'))
+		# print(session)
+		# if session.get('code') != None:
+		# temp = int(verify_data['otp_code'])
+		if g_code == int(verify_data['otp_code']):
+			# otp_status = "approved"
+			data = users.find_one({"mobile_number":g_mobile_number})
+			# Serialize the document using the custom encoder
+			data = json.dumps(data, cls=JSONEncoder)
+			# session.pop('code', None)
+			g_mobile_number = None
+			g_code = 0
 		else:
-			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
+			return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
+		# else:
+		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	return jsonify(data)
 
+
+# check_otp()
 # Store property data 
 @app.route('/property_save', methods=['POST'])
 def property_save():
