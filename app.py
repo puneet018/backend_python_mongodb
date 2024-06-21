@@ -112,6 +112,7 @@ def login_user():
 		create_login_user(mobile_number)
 	else:
 		status = send_otp_via_sms(mobile_number)
+		
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
@@ -165,7 +166,7 @@ def check_otp():
 			# otp_status = "approved"
 			data = users.find_one({"mobile_number":g_mobile_number})
 			# Serialize the document using the custom encoder
-			data = json.dumps(data, cls=JSONEncoder)
+			# data = json.dumps(data, cls=JSONEncoder)
 			# session.pop('code', None)
 			g_mobile_number = None
 			g_code = 0
@@ -175,7 +176,7 @@ def check_otp():
 		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
-	return jsonify(data)
+	return JSONEncoder().encode(data)
 
 
 # check_otp()
