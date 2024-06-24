@@ -112,13 +112,26 @@ def login_user():
 		create_login_user(mobile_number)
 	else:
 		status = send_otp_via_sms(mobile_number)
-		
+	
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
 	# find_user = users.find_one(mobile_number)
 	return status
 
+@app.route('/login_user_manual', methods=['POST'])
+def login_user_manual():
+	user = request.get_json()
+	email = user['email']
+	password = user['password']
+	find_user = users.find_one({"email":email})
+	if find_user == None:
+		return jsonify({'status':'404','message':'Please create account first'})
+	else:
+		if find_user['password'] == password:
+			return JSONEncoder().encode(find_user)
+		else:
+			return jsonify({'status':'500','message':'Password is not correct'})
 
 # Define the global variable
 g_code = 0
