@@ -121,6 +121,8 @@ def login_user():
 
 @app.route('/login_user_manual', methods=['POST'])
 def login_user_manual():
+	app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+	print(session.permanent)
 	user = request.get_json()
 	email = user['email']
 	password = user['password']
@@ -129,7 +131,7 @@ def login_user_manual():
 		return jsonify({'status':'404','message':'Please create account first'})
 	else:
 		if find_user['password'] == password:
-			return JSONEncoder().encode(find_user)
+			return JSONEncoder().encode(find_user), 200
 		else:
 			return jsonify({'status':'500','message':'Password is not correct'})
 
@@ -189,6 +191,7 @@ def check_otp():
 		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
+	data['status_code'] = 200
 	return JSONEncoder().encode(data)
 
 
