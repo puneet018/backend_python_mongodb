@@ -86,10 +86,10 @@ def create_user():
 		# new user insert
 		_id = users.insert_one(new_user)
 	else:
-		return jsonify({'status_code':'200','message':'already registered'})
+		return jsonify({'status_code':200,'message':'already registered'})
 	# sending opt for verification of user
 	# status  = send_otp_via_sms(mobile_number)
-	return jsonify({'status_code':'200','message':'done'})
+	return jsonify({'status_code':200,'message':'done'})
 
 def create_login_user(mobile_number):
 	new_user = request.get_json()
@@ -113,8 +113,8 @@ def login_user():
 	else:
 		status = send_otp_via_sms(mobile_number)
 		# ['new_user_code']='100'
-	# 	status['p']=1
-	# print(status)
+		status.get_data(new_user_code=100)
+	print(status)
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
@@ -131,12 +131,12 @@ def login_user_manual():
 	password = user['password']
 	find_user = users.find_one({"email":email})
 	if find_user == None:
-		return jsonify({'status_code':'404','message':'Please create account first'})
+		return jsonify({'status_code':404,'message':'Please create account first'})
 	else:
 		if find_user['password'] == password:
 			return JSONEncoder().encode(find_user), 200
 		else:
-			return jsonify({'status_code':'500','message':'Password is not correct'})
+			return jsonify({'status_code':500,'message':'Password is not correct'})
 
 # Define the global variable
 g_code = 0
@@ -153,11 +153,11 @@ def send_otp_via_sms(mobile_number):
 	# session['mobile_number'] = mobile_number
 	g_mobile_number = mobile_number
 	# app.logger.info(f'Session set: {session["code"]}')
-	# massage = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
+	# message = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")npm install -g firebase-tools
 	# print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
-	return jsonify({'status_code':'200','massage':'massage.status'})
+	return jsonify({'status_code':200,'message':'message.status'})
 
 # def set_cookie():
 #     # resp = make_response("Setting a cookie!")
