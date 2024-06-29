@@ -86,10 +86,10 @@ def create_user():
 		# new user insert
 		_id = users.insert_one(new_user)
 	else:
-		return 'already registered'
+		return jsonify({'status_code':'200','message':'already registered'})
 	# sending opt for verification of user
 	# status  = send_otp_via_sms(mobile_number)
-	return 'done'
+	return jsonify({'status_code':'200','message':'done'})
 
 def create_login_user(mobile_number):
 	new_user = request.get_json()
@@ -112,11 +112,14 @@ def login_user():
 		create_login_user(mobile_number)
 	else:
 		status = send_otp_via_sms(mobile_number)
-	
+		# ['new_user_code']='100'
+	# 	status['p']=1
+	# print(status)
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
 	# find_user = users.find_one(mobile_number)
+	
 	return status
 
 @app.route('/login_user_manual', methods=['POST'])
@@ -128,12 +131,12 @@ def login_user_manual():
 	password = user['password']
 	find_user = users.find_one({"email":email})
 	if find_user == None:
-		return jsonify({'status':'404','message':'Please create account first'})
+		return jsonify({'status_code':'404','message':'Please create account first'})
 	else:
 		if find_user['password'] == password:
 			return JSONEncoder().encode(find_user), 200
 		else:
-			return jsonify({'status':'500','message':'Password is not correct'})
+			return jsonify({'status_code':'500','message':'Password is not correct'})
 
 # Define the global variable
 g_code = 0
@@ -154,7 +157,7 @@ def send_otp_via_sms(mobile_number):
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
 	#  to = mobile_number, channel="sms")npm install -g firebase-tools
 	# print(str(session.get('code'))+str('-------send_otp_via_sms-------'))
-	return 'massage.status'
+	return jsonify({'status_code':'200','massage':'massage.status'})
 
 # def set_cookie():
 #     # resp = make_response("Setting a cookie!")
