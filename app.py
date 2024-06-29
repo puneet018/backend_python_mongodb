@@ -113,12 +113,10 @@ def login_user():
 	
 	if find_user == None:
 		status = create_login_user(mobile_number)
-		# status.set_data('{"new_user_code":100}')
 	else:
 		status = send_otp_via_sms(mobile_number)
 		# ['new_user_code']='100'
 		
-	print(status)
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
 	# if otp_status == 'approved':
@@ -145,6 +143,7 @@ def login_user_manual():
 # Define the global variable
 g_code = 0
 g_mobile_number = None
+g_new_user_vi_number = 0
 
 # send otp to user number
 def send_otp_via_sms(mobile_number):
@@ -187,6 +186,10 @@ def check_otp():
 		if g_code == int(verify_data['otp_code']):
 			# otp_status = "approved"
 			data = users.find_one({"mobile_number":g_mobile_number})
+			if data and 'email' in data:
+				data['new_user_code'] = 200
+			else:
+				data['new_user_code'] = 100
 			# Serialize the document using the custom encoder
 			# data = json.dumps(data, cls=JSONEncoder)
 			# session.pop('code', None)
@@ -199,6 +202,7 @@ def check_otp():
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	data['status_code'] = 200
+	
 	return JSONEncoder().encode(data)
 
 
