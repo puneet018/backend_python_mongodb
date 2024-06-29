@@ -101,19 +101,23 @@ def create_login_user(mobile_number):
 		# old user forward to login
 	# sending opt for verification of user
 	status  = send_otp_via_sms(mobile_number)
+	return status
 
 # login user with otp
 @app.route('/login_user', methods=['POST'])
 def login_user():
+	status = jsonify({})
 	user = request.get_json()
 	mobile_number = user['mobile_number']
 	find_user = users.find_one({"mobile_number":mobile_number})
+	
 	if find_user == None:
-		create_login_user(mobile_number)
+		status = create_login_user(mobile_number)
+		# status.set_data('{"new_user_code":100}')
 	else:
 		status = send_otp_via_sms(mobile_number)
 		# ['new_user_code']='100'
-		status.get_data(new_user_code=100)
+		
 	print(status)
 	# sending opt for verification of user
 	# status = send_otp_via_sms(mobile_number)
