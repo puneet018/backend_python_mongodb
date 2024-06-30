@@ -189,7 +189,7 @@ def check_otp():
 			if data and 'email' in data:
 				data['new_user_code'] = 200
 			else:
-				data['new_user_code'] = 100
+				data['is_new_user'] = 'yes'
 			# Serialize the document using the custom encoder
 			# data = json.dumps(data, cls=JSONEncoder)
 			# session.pop('code', None)
@@ -201,7 +201,7 @@ def check_otp():
 		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
-	data['status_code'] = 200
+	data['is_new_user'] = 'no'
 	
 	return JSONEncoder().encode(data)
 
