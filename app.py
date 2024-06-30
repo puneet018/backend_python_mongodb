@@ -187,7 +187,7 @@ def check_otp():
 			# otp_status = "approved"
 			data = users.find_one({"mobile_number":g_mobile_number})
 			if data and 'email' in data:
-				data['new_user_code'] = 200
+				data['is_new_user'] = 'no'
 			else:
 				data['is_new_user'] = 'yes'
 			# Serialize the document using the custom encoder
