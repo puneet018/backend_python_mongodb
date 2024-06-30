@@ -201,7 +201,7 @@ def check_otp():
 		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
-	data['is_new_user'] = 'no'
+	data['status_code'] = 200
 	
 	return JSONEncoder().encode(data)
 
