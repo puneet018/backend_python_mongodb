@@ -91,6 +91,7 @@ def create_user():
 	# status  = send_otp_via_sms(mobile_number)
 	return jsonify({'status_code':200,'message':'done'})
 
+# Create New Users when it will come from direct with login
 def create_login_user(mobile_number):
 	new_user = request.get_json()
 	new_user['mobile_number'] = mobile_number
@@ -136,7 +137,8 @@ def login_user_manual():
 		return jsonify({'status_code':404,'message':'Please create account first'})
 	else:
 		if find_user['password'] == password:
-			return JSONEncoder().encode(find_user), 200
+			find_user['status_code'] = 200
+			return JSONEncoder().encode(find_user)
 		else:
 			return jsonify({'status_code':500,'message':'Password is not correct'})
 
@@ -172,7 +174,7 @@ def send_otp_via_sms(mobile_number):
 
 
 
-# check OTP
+# Check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
 	global g_code, g_mobile_number
@@ -204,6 +206,16 @@ def check_otp():
 	data['status_code'] = 200
 	
 	return JSONEncoder().encode(data)
+
+# Save user details in DB
+@app.route('/save_user_details', methods=['POST'])
+def save_user_details():
+	new_user_details = request.get_json()
+	object_id = new_user_details['_id']
+	# Values to be updated.
+	new_user_values = { "$set": { 'full_name':new_user_details['full_name'], 'email': new_user_details['email'] } }
+	_id = users.update_one({'_id': object_id},new_user_values)
+	return jsonify({'status_code':200,'message':'updated'})
 
 
 # check_otp()
