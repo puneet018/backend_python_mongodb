@@ -149,13 +149,14 @@ g_new_user_vi_number = 0
 
 # send otp to user number
 def send_otp_via_sms(mobile_number):
-	# session.permanent = True
+	session.permanent = True
+	# response.html.render(send_cookies_session=True)
 	global g_code
 	global g_mobile_number
 	code = random.randint(100000, 999999)
-	# session['code'] = 121212
+	session['code'] = 121212
 	g_code = 121212
-	# session['mobile_number'] = mobile_number
+	session['mobile_number'] = mobile_number
 	g_mobile_number = mobile_number
 	# app.logger.info(f'Session set: {session["code"]}')
 	# message = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
@@ -171,9 +172,6 @@ def send_otp_via_sms(mobile_number):
 # 	request_set = request.post('backend-python-mongodb.onrender.com', cookies=cookies)
 # 	return request_set
 
-
-
-
 # Check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
@@ -181,9 +179,12 @@ def check_otp():
 	verify_data = request.get_json()
 	try:
 		# set_cookie()
-		# print(request.cookies.get('session'))
-		# print(session)
-		# if session.get('code') != None:
+		print(request.cookies.get('session'))
+		print(session)
+		if session.get('code') != None:
+			print('working')
+		else:
+			print('not working')
 		# temp = int(verify_data['otp_code'])
 		if g_code == int(verify_data['otp_code']):
 			# otp_status = "approved"
@@ -214,7 +215,7 @@ def save_user_details():
 	object_id = new_user_details['_id']
 	# Values to be updated.
 	new_user_values = { "$set": { 'full_name':new_user_details['full_name'], 'email': new_user_details['email'] } }
-	_id = users.update_one({'_id': object_id},new_user_values)
+	users.update_one({'_id': object_id},new_user_values)
 	return jsonify({'status_code':200,'message':'updated'})
 
 
