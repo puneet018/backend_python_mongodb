@@ -151,13 +151,13 @@ g_new_user_vi_number = 0
 def send_otp_via_sms(mobile_number):
 	session.permanent = True
 	# response.html.render(send_cookies_session=True)
-	global g_code
-	global g_mobile_number
+	# global g_code
+	# global g_mobile_number
 	code = random.randint(100000, 999999)
 	session['code'] = 121212
-	g_code = 121212
+	# g_code = 121212
 	session['mobile_number'] = mobile_number
-	g_mobile_number = mobile_number
+	# g_mobile_number = mobile_number
 	# app.logger.info(f'Session set: {session["code"]}')
 	# message = client.messages.create(body=f"Hello Dear User Your one-time password is "+str(code), from_=from_number,  to=mobile_number)
 	# otp_verification = client.verify.services(verify_sid).verifications.create(
@@ -175,33 +175,31 @@ def send_otp_via_sms(mobile_number):
 # Check OTP
 @app.route('/check_otp', methods=['POST'])
 def check_otp():
-	global g_code, g_mobile_number
+	# global g_code, g_mobile_number
 	verify_data = request.get_json()
 	try:
 		# set_cookie()
-		print(request.cookies.get('session'))
-		print(session)
+		# print(request.cookies.get('session'))
+		# print(session)
 		if session.get('code') != None:
 			print('working')
-		else:
-			print('not working')
-		# temp = int(verify_data['otp_code'])
-		if g_code == int(verify_data['otp_code']):
-			# otp_status = "approved"
-			data = users.find_one({"mobile_number":g_mobile_number})
-			if data and 'email' in data:
-				data['is_new_user'] = 'no'
+				# temp = int(verify_data['otp_code'])
+			if session.get('code') == int(verify_data['otp_code']):
+				# otp_status = "approved"
+				data = users.find_one({"mobile_number":session.get('mobile_number')})
+				if data and 'email' in data:
+					data['is_new_user'] = 'no'
+				else:
+					data['is_new_user'] = 'yes'
+				# Serialize the document using the custom encoder
+				# data = json.dumps(data, cls=JSONEncoder)
+				session.pop('code', None)
+				# g_mobile_number = None
+				# g_code = 0
 			else:
-				data['is_new_user'] = 'yes'
-			# Serialize the document using the custom encoder
-			# data = json.dumps(data, cls=JSONEncoder)
-			# session.pop('code', None)
-			g_mobile_number = None
-			g_code = 0
+				return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
 		else:
-			return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
-		# else:
-		# 	return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
+			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	data['status_code'] = 200
