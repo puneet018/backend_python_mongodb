@@ -142,6 +142,11 @@ def login_user_manual():
 		else:
 			return jsonify({'status_code':500,'message':'Password is not correct'})
 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    # return redirect(url_for('index'))
+
 # Define the global variable
 g_code = 0
 g_mobile_number = None
@@ -181,8 +186,8 @@ def check_otp():
 		# set_cookie()
 		# print(request.cookies.get('session'))
 		# print(session)
-		if session.get('code') != None:
-			print('working')
+		# if session.get('code') != None:
+		if 'code' in session.keys():
 				# temp = int(verify_data['otp_code'])
 			if session.get('code') == int(verify_data['otp_code']):
 				# otp_status = "approved"
@@ -194,6 +199,7 @@ def check_otp():
 				# Serialize the document using the custom encoder
 				# data = json.dumps(data, cls=JSONEncoder)
 				session.pop('code', None)
+				session['logged_in']=True
 				# g_mobile_number = None
 				# g_code = 0
 			else:
