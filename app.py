@@ -200,12 +200,13 @@ def check_otp():
 				# data = json.dumps(data, cls=JSONEncoder)
 				session.pop('code', None)
 				session['logged_in']=True
+				data['logged_in'] = 'yes'
 				# g_mobile_number = None
 				# g_code = 0
 			else:
 				return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
 		else:
-			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp"})
+			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp", 'logged_in' : 'no'})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	data['status_code'] = 200
@@ -281,7 +282,7 @@ def get_user(user_id):
         return jsonify({'error': 'User not found'}), 404
 
 
-# # Route to update a user by ID
+# Route to update a user by ID
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     user = next((u for u in data if u['id'] == user_id), None)
