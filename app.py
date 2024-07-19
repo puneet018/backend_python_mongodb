@@ -138,6 +138,8 @@ def login_user_manual():
 	else:
 		if find_user['password'] == password:
 			find_user['status_code'] = 200
+			session['logged_in']=True
+			find_user['session'] = 'yes'
 			return JSONEncoder().encode(find_user)
 		else:
 			return jsonify({'status_code':500,'message':'Password is not correct'})
