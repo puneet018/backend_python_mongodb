@@ -147,7 +147,7 @@ def login_user_manual():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    # return redirect(url_for('index'))
+    return jsonify({'status_code':500,'message':'Logout Done','session':'no'})
 
 # Define the global variable
 g_code = 0
