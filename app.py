@@ -5,12 +5,16 @@ from twilio.rest import Client
 import json, random
 from bson import ObjectId
 from configparser import ConfigParser
-from datetime import timedelta
+from datetime import datetime, timedelta
+# from flask_session import Session
 import os
-
-
+# import jwt
+# from flask_sqlalchemy import SQLAlchemy
+# from functools import wraps
 
 app = Flask(__name__)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 
 app.secret_key = 'mynameisnick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
@@ -34,6 +38,33 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, ObjectId):
             return str(o)
         return super().default(o)
+
+# decorator for verifying the JWT
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         # jwt is passed in the request header
+#         if 'x-access-token' in request.headers:
+#             token = request.headers['x-access-token']
+#         # return 401 if token is not passed
+#         if not token:
+#             return jsonify({'message' : 'Token is missing !!'}), 401
+  
+#         try:
+#             # decoding the payload to fetch the stored details
+#             data = jwt.decode(token, app.config['SECRET_KEY'])
+#             current_user = User.query\
+#                 .filter_by(public_id = data['public_id'])\
+#                 .first()
+#         except:
+#             return jsonify({
+#                 'message' : 'Token is invalid !!'
+#             }), 401
+#         # returns the current logged in users context to the routes
+#         return  f(current_user, *args, **kwargs)
+  
+#     return decorated
 
 
 # Route to get all users
@@ -127,7 +158,7 @@ def login_user():
 
 @app.route('/login_user_manual', methods=['POST'])
 def login_user_manual():
-	app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+	app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=1)
 	print(session.permanent)
 	user = request.get_json()
 	email = user['email']
@@ -139,7 +170,7 @@ def login_user_manual():
 		if find_user['password'] == password:
 			find_user['status_code'] = 200
 			session['logged_in']=True
-			find_user['session'] = 'yes'
+			find_user['session'] = True
 			return JSONEncoder().encode(find_user)
 		else:
 			return jsonify({'status_code':500,'message':'Password is not correct'})
@@ -147,7 +178,7 @@ def login_user_manual():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    return jsonify({'status_code':500,'message':'Logout Done','session':'no'})
+    return jsonify({'status_code':500,'message':'Logout Done','session':False})
 
 # Define the global variable
 g_code = 0
@@ -186,7 +217,7 @@ def check_otp():
 	verify_data = request.get_json()
 	try:
 		# set_cookie()
-		# print(request.cookies.get('session'))
+		print(request.cookies.get('session'))
 		# print(session)
 		# if session.get('code') != None:
 		if 'code' in session.keys():
@@ -202,13 +233,13 @@ def check_otp():
 				# data = json.dumps(data, cls=JSONEncoder)
 				session.pop('code', None)
 				session['logged_in']=True
-				data['session'] = 'yes'
+				data['session'] = True
 				# g_mobile_number = None
 				# g_code = 0
 			else:
 				return jsonify({'status_code':500, 'message' : "wrong please resend OTP"})
 		else:
-			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp", 'session' : 'no'})
+			return jsonify({'status_code':500, 'message' : "Session is expire please resend otp", 'session' : False})
 	except (BaseException) as e:
 		return jsonify({"status_code": 500, "message": str(e)})
 	data['status_code'] = 200
