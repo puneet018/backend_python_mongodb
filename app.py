@@ -8,6 +8,7 @@ from configparser import ConfigParser
 from datetime import datetime, timedelta
 # from flask_session import Session
 import os
+from bson import json_util
 # import jwt
 # from flask_sqlalchemy import SQLAlchemy
 # from functools import wraps
@@ -289,11 +290,21 @@ def property_save():
 # Get properties data 
 @app.route('/properties_get', methods=['GET'])
 def properties_get():
+	
 	try:
-		response_data = jsonify({'status': 200, 'data': properties.find()})
+		
+		# print([prop for prop in properties.find()])
+		# print(JSONEncoder().encode(([prop for prop in properties.find({})])))
+		properties_data = properties.find()
+	# print(data)
+	# print(json.dumps(data, default=str))
+		# response_data = properties_data
+		# return properties_data
+		# response_data = jsonify({'status': 200, 'data': JSONEncoder().encode([prop for prop in properties.find({})])})
+		return jsonify({'status': 200, 'data': json.loads(json_util.dumps(properties_data))})
 	except (BaseException) as e:
-		response_data = jsonify({"status": 404, "message": str(e)})
-	return response_data
+	 	return jsonify({"status": 404, "message": str(e)})
+	# return response_data
 
 # Get properties data 
 @app.route('/properties_get/<int:property_id>', methods=['GET'])
