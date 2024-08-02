@@ -29,8 +29,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 client = pymongo.MongoClient('mongodb+srv://shivams:shivams@cluster0.jc8u7cz.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=Cluster0')
 userdb = client['FlaskDB']
 users = userdb.users
-properties = userdb.properties
 # properties = userdb.properties
+properties = userdb.property
 
 otp_status = ''
 
@@ -266,32 +266,19 @@ def save_user_details():
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
-	property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
-
-	try:
-		target = os.path.join(APP_ROOT, 'property-images')  #folder path
-		if not os.path.isdir(target):
-				os.mkdir(target)     # create folder if not exits
-		if 'propertyImages' in request.files:
-			# property_image_name = []
-			# i = 0
-			for upload in request.files.getlist('propertyImages'):
-				
-				property_image_name = secure_filename(upload.filename)
-				# i = 1+i
-				# print(property_image_name)
-				destination = "/".join([target, property_image_name])
-				upload.save(destination)
-			property_data['propertyImages'] = property_image_name
-			print(property_data)
-			_id = properties.insert_one(property_data)
-			response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
-		else:
-			response_data = jsonify({'status': 200, 'status_msg': 'Image is not save'})
-
-	except (BaseException) as e:
-		response_data = jsonify({"status": 404, "message": str(e)})
+	property_data = request.form
+	property_data_files = request.files
+	
+	print(property_data.get("propName"))
+	print(property_data_files)
+	# property_data = request.get_json()
+	# try:
+	# 	_id = properties.insert_one(property_data)
+	# 	response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+	# except (BaseException) as e:
+	response_data = jsonify({"status": 404, "message": str('e')})
 	return response_data
+	
 
 
 # Get properties data 

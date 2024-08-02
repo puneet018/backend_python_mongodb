@@ -1,0 +1,137 @@
+property_data = {
+#     "address": "address1",
+#     "description": "longText",
+#     "name": "Homemaker Grande A",
+#     "type": PropertyType.residential,
+#     "position": {
+#       "lat": 8.948677279926585,
+#       "lng": 125.5470567303216,
+#     },
+#     "price": 210000,
+#     "images": "images1",
+#     "updatedAt": Date(),
+#     "enquiries": ['12'],
+#     "currency": "PHP",
+#     "features": ['Item 1', 'Item 2', 'Item 3', 'Item 4'],
+#     "user_id": '01',
+#   }
+
+
+
+@app.route('/property_save', methods=['POST'])
+def property_save():
+	property_data = request.get_json()
+	# property_data = {'propDes': request.get_data('propDes'),'propName':request.get_data('propName'), 'propType':request.get_data('propType')}
+	# print(property_data)
+	# request.get_data('propDes')
+# 	
+	try:
+	# target = os.path.join(APP_ROOT, 'property-images/')  #folder path
+	# if not os.path.isdir(target):
+	# 		os.mkdir(target)     # create folder if not exits
+	# face_db_table = d.mongo.db.faces  # database table name
+	# if 'property_images' in request.files:
+	# 	for upload in request.files.getlist('property_images'):
+
+	# 		property_image_name = secure_filename(upload.filename)
+	# 		print(property_image_name)
+	# 		# destination = "/".join([target, property_image_name])
+	# 		# upload.save(destination)
+	# 		# properties.insert({'property_image': property_images})
+	# 		# properties.save(property_images.filename, property_images)
+	# 		# property_data['property_image_name'] = property_images.filename
+	# 	property_data['propertyImages'] = property_image_name
+		# print(property_data)
+		_id = properties.insert_one(property_data)
+		response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+	# else:
+		# response_data = jsonify({'status': 200, 'status_msg': 'Image is not save'})
+
+	except (BaseException) as e:
+		response_data = jsonify({"status": 404, "message": str(e)})
+	return response_data
+    
+
+
+
+
+propName
+"RK Plaza"
+propAdd
+"vijay nagar"
+propDes
+"shops are available"
+propType
+"commercial"
+
+propName
+"Adi Plaza "
+propAdd
+"Sadar"
+propDes
+"Rooms are available"
+propType
+"commercial"
+
+
+"propType"
+"commercial",
+propName
+"Arora House",
+"propAdd"
+"Gwarighat",
+"propDes"
+"Rooms are available"
+
+
+{
+"propName":
+"Shri Ganesh Property",
+"propAdd":
+"Vijay Nagar",
+"propDes":
+"Rooms are available",
+"propType":
+"commercial"}
+
+
+{
+"propName":
+"Silver Park",
+"propAdd":
+"Vijay Nagar",
+"propDes":
+"Rooms are available",
+"propType":
+"commercial"}
+
+{
+"propName":
+"Gupta House",
+"propAdd":
+"Vijay Nagar",
+"propDes":
+"Rooms are available",
+"propType":
+"residential"}
+
+
+{
+"propName":
+"Galaxy",
+"propAdd":
+"Vijay Nagar",
+"propDes":
+"Rooms are available",
+"propType":
+"residential"}
+
+{
+"propName":
+"Mannat",
+"propAdd":
+"Vijay Nagar",
+"propDes":
+"Rooms are available",
+"propType":
+"residential"}
