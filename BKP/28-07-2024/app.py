@@ -266,7 +266,7 @@ def save_user_details():
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
-	property_data = request.get_json()
+	# property_data = request.get_json()
 	property_data = {'propDes': request.get_data('propDes'),'propName':request.get_data('propName'), 'propType':request.get_data('propType')}
 	print(property_data)
 	request.get_data('propDes')
@@ -275,7 +275,7 @@ def property_save():
 		target = os.path.join(APP_ROOT, 'property-images/')  #folder path
 		if not os.path.isdir(target):
 				os.mkdir(target)     # create folder if not exits
-		face_db_table = d.mongo.db.faces  # database table name
+		# face_db_table = d.mongo.db.faces  # database table name
 		if 'property_images' in request.files:
 			for upload in request.files.getlist('property_images'):
 
@@ -288,7 +288,7 @@ def property_save():
 				# property_data['property_image_name'] = property_images.filename
 			property_data['propertyImages'] = property_image_name
 			print(property_data)
-			_id = properties.insert_one(property_data)
+			# _id = properties.insert_one(property_data)
 			response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 		else:
 			response_data = jsonify({'status': 200, 'status_msg': 'Image is not save'})

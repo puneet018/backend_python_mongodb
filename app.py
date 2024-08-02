@@ -300,7 +300,7 @@ def properties_get():
 	
 	try:
 		properties_data = JSONEncoder().encode([prop for prop in properties.find({})])
-		return jsonify({'status': 200, 'data': json.loads(json_util.dumps(properties_data,default=str))})
+		return jsonify({'status': 200, 'data': json.loads(properties_data)})
 	except (BaseException) as e:
 	 	return jsonify({"status": 404, "message": str(e)})
 
