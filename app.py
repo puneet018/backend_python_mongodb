@@ -267,7 +267,8 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
-
+	print(property_data)
+	print(request.files)
 	try:
 		target = os.path.join(APP_ROOT, 'property-images')  #folder path
 		if not os.path.isdir(target):
@@ -283,8 +284,9 @@ def property_save():
 				destination = "/".join([target, property_image_name])
 				upload.save(destination)
 			property_data['propertyImages'] = property_image_name
+			print("-------------------------------")
 			print(property_data)
-			_id = properties.insert_one(property_data)
+			# _id = properties.insert_one(property_data)
 			response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 		else:
 			response_data = jsonify({'status': 200, 'status_msg': 'Image is not save'})
@@ -300,6 +302,9 @@ def properties_get():
 	
 	try:
 		properties_data = JSONEncoder().encode([prop for prop in properties.find({})])
+		jdata = json.loads(properties_data)
+		print(len(jdata))
+		# find_user = users.find_one({"id":email})
 		return jsonify({'status': 200, 'data': json.loads(properties_data)})
 	except (BaseException) as e:
 	 	return jsonify({"status": 404, "message": str(e)})
