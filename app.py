@@ -269,7 +269,7 @@ def property_save():
 	property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
 	print(property_data)
 	print(request.files)
-	property_data['images':request.files]
+	# property_data['images':request.files]
 	try:
 		target = os.path.join(APP_ROOT, 'property-images')  #folder path
 		if not os.path.isdir(target):
