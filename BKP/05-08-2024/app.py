@@ -266,42 +266,35 @@ def save_user_details():
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
-	# property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
-	property_data = request.form.get('json')
+	property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
 	print(property_data)
 	print(request.files)
 	# property_data['images':request.files]
-	if property_data:
-		property_data = json.loads('json') # parse the JSON string
-		print(property_data)
-		try:
-			target = os.path.join(APP_ROOT, 'property-images')  #folder path
-			if not os.path.isdir(target):
-					os.mkdir(target)     # create folder if not exits
-			# Access file data
-			if 'propertyImages' in request.files:
-				# property_image_name = []
-				# i = 0
-				for upload in request.files.getlist('propertyImages'):
-					
-					property_image_name = secure_filename(upload.filename)
-					# i = 1+i
-					# print(property_image_name)
-					destination = "/".join([target, property_image_name])
-					upload.save(destination)
-				property_data['propertyImages'] = property_image_name
-				print("-------------------------------")
-				print(property_data)
-				# _id = properties.insert_one(property_data)
-				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
-			else:
-				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
+	try:
+		target = os.path.join(APP_ROOT, 'property-images')  #folder path
+		if not os.path.isdir(target):
+				os.mkdir(target)     # create folder if not exits
+		if 'propertyImages' in request.files:
+			# property_image_name = []
+			# i = 0
+			for upload in request.files.getlist('propertyImages'):
+				
+				property_image_name = secure_filename(upload.filename)
+				# i = 1+i
+				# print(property_image_name)
+				destination = "/".join([target, property_image_name])
+				upload.save(destination)
+			property_data['propertyImages'] = property_image_name
+			print("-------------------------------")
+			print(property_data)
+			# _id = properties.insert_one(property_data)
+			response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+		else:
+			response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
 
-		except (BaseException) as e:
-			response_data = jsonify({"status": 404, "message": str(e)})
-		return response_data
-	else:
-		return jsonify({"status": 404, "message":"data not available"})
+	except (BaseException) as e:
+		response_data = jsonify({"status": 404, "message": str(e)})
+	return response_data
 
 
 # Get properties data 
