@@ -270,9 +270,10 @@ def property_save():
 	property_data = request.form.get('json')
 	print(property_data)
 	print(request.files)
+	print(request.files['file'])
 	# property_data['images':request.files]
 	if property_data:
-		property_data = json.loads('json') # parse the JSON string
+		property_data = json.loads(property_data) # parse the JSON string
 		print(property_data)
 		try:
 			target = os.path.join(APP_ROOT, 'property-images')  #folder path
@@ -282,7 +283,7 @@ def property_save():
 			if 'propertyImages' in request.files:
 				# property_image_name = []
 				# i = 0
-				for upload in request.files.getlist('propertyImages'):
+				for upload in request.files['file'].getlist('propertyImages'):
 					
 					property_image_name = secure_filename(upload.filename)
 					# i = 1+i
