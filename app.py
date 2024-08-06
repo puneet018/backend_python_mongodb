@@ -267,9 +267,17 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	# property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
+	property_data = request.get_json()
+	print('--------get_json')
+	print(property_data)
+	print('--------get')
 	property_data = request.form.get('json')
 	print(property_data)
+	print('--------json')
+	property_data = request.json
+	print(property_data)
 	print(request.files)
+	print('--------file')
 	print(request.files['file'])
 	# property_data['images':request.files]
 	if property_data:
