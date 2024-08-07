@@ -273,6 +273,7 @@ def property_save():
 	# print('--------get')
 	property_data = request.form.get('json')
 	print('--------json')
+	print(property_data)
 	print(request.files)
 	print('--------file')
 	print(request.files['file'])
