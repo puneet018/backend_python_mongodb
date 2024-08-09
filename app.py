@@ -272,11 +272,8 @@ def property_save():
 	# print(property_data)
 	# print('--------get')
 	property_data = request.form.get('json')
-	print('--------json')
-	print(property_data)
-	# print(request.files['file'])
 	print('--------file')
-	print(request.files)
+	print(request.files['file'].getlist('propertyImages'))
 	# property_data['images':request.files]
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
@@ -287,7 +284,7 @@ def property_save():
 					os.mkdir(target)     # create folder if not exits
 			# Access file data
 			print('--------propertyImages')
-			if 'propertyImages' in request.files:
+			if 'file' in request.files:
 				# property_image_name = []
 				# i = 0
 				for upload in request.files['file'].getlist('propertyImages'):
@@ -300,7 +297,7 @@ def property_save():
 				property_data['propertyImages'] = property_image_name
 				print("-------------------------------")
 				print(property_data)
-				# _id = properties.insert_one(property_data)
+				_id = properties.insert_one(property_data)
 				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 			else:
 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
