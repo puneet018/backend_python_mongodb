@@ -273,7 +273,7 @@ def property_save():
 	# print('--------get')
 	property_data = request.form.get('json')
 	print('--------file')
-	print(request.files['propertyImages'])
+	print(request.files)
 	# property_data['images':request.files]
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
@@ -355,6 +355,16 @@ def property_delete(property_id):
 # 	return response_data
 
 
+# Route to update a user by ID
+@app.route('/property_update/<int:propertyId>', methods=['PUT'])
+def property_update(propertyId):
+    property = next((p for p in properties if p['id'] == propertyId), None)
+    if property:
+        updates = request.get_json()
+        property.update(updates)
+        return jsonify(property)
+    else:
+        return jsonify({'error': 'User not found'}), 404
 
 
 # Route to get a user by ID
