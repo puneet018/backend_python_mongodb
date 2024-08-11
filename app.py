@@ -273,7 +273,7 @@ def property_save():
 	# print('--------get')
 	property_data = request.form.get('json')
 	print('--------file')
-	print('--------file--------',request.files['propertyImages'])
+	print(request.files['propertyImages'])
 	# property_data['images':request.files]
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
