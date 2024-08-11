@@ -284,6 +284,8 @@ def property_save():
 					os.mkdir(target)     # create folder if not exits
 			# Access file data
 			print('--------propertyImages')
+			print('file' in request.files)
+			print('------------------------------------propertyImages')
 			if 'file' in request.files:
 				# property_image_name = []
 				# i = 0
