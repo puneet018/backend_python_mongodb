@@ -359,11 +359,14 @@ def property_delete(property_id):
 @app.route('/property_update/<int:propertyId>', methods=['PUT'])
 def property_update(propertyId):
     property = next((p for p in properties if p['id'] == propertyId), None)
+	# print(property)	
     if property:
+		
         updates = request.get_json()
         property.update(updates)
         return jsonify(property)
     else:
+		
         return jsonify({'error': 'User not found'}), 404
 
 
@@ -394,6 +397,41 @@ def delete_user(user_id):
     global data
     data = [u for u in data if u['id'] != user_id]
     return '', 204
+
+
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+@app.route('/upload_file', methods=['POST'])
+def upload_file():
+	print('--------Get text ---------------')
+	# text = request.form.get('json')
+	# print(text)
+	print('--------get file ------------------------ ')
+	print(request.files)
+	# property_data['images':request.files]
+	return "file uploading.."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
