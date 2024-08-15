@@ -290,7 +290,6 @@ def property_save():
 		if 'file' in request.files:
 			# property_image_name = []
 			# i = 0
-			
 			print("--------------1-----------------")
 			for upload in request.files['file'].getlist('propertyImages'):
 				print("------------2-------------------")
