@@ -285,21 +285,26 @@ def property_save():
 			# Access file data
 			print('--------propertyImages')
 			print('file' in request.files)
+			print(request.files['file'].getlist('propertyImages'))
 			print('------------------------------------propertyImages')
 			if 'file' in request.files:
 				# property_image_name = []
 				# i = 0
+				print("--------------1-----------------")
 				for upload in request.files['file'].getlist('propertyImages'):
-					
+					print("------------2-------------------")
 					property_image_name = secure_filename(upload.filename)
-					# i = 1+i
-					# print(property_image_name)
+					print(property_image_name)
+					print("---------------3----------------")
 					destination = "/".join([target, property_image_name])
+					print("------------------4-------------")
 					upload.save(destination)
+					print("--------------5-----------------")
 				property_data['propertyImages'] = property_image_name
-				print("-------------------------------")
+				print("---------------6----------------")
 				print(property_data)
 				_id = properties.insert_one(property_data)
+				print("----------------7---------------")
 				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 			else:
 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
@@ -399,19 +404,30 @@ def delete_user(user_id):
     return '', 204
 
 
+# @app.route('/upload', methods=['POST'])
+# def upload():
+#     print("Request files:", request.files)
+#     print("Request form:", request.form)
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-@app.route('/upload_file', methods=['POST'])
-def upload_file():
-	print('--------Get text ---------------')
-	# text = request.form.get('json')
-	# print(text)
-	print('--------get file ------------------------ ')
-	print(request.files)
-	# property_data['images':request.files]
-	return "file uploading.."
+#     json_data = request.form.get('json')
+#     if json_data:
+#         json_data = json.loads(json_data)
+#         print("JSON data received:", json_data)
 
+#     if 'file' not in request.files:
+#         return jsonify({"error": "No file part in the request"}), 400
 
+#     file = request.files['file']
+#     if file.filename == '':
+#         return jsonify({"error": "No selected file"}), 400
+
+#     if file:
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['property-images'], filename))
+# 		property_image_name = secure_filename(upload.filename)
+# 		destination = "/".join([target, property_image_name])
+# 		upload.save(destination)
+#     	return jsonify({"message": "File successfully uploaded"}), 200
 
 
 
