@@ -285,21 +285,23 @@ def property_save():
 		# Access file data
 		print('--------propertyImages')
 		print('file' in request.files)
-		print(request.files['file'].getlist('propertyImages'))
+		file = request.files['file']
+		print(file.filename)
+
 		print('------------------------------------propertyImages')
 		if 'file' in request.files:
 			# property_image_name = []
 			# i = 0
 			print("--------------1-----------------")
-			for upload in request.files['file'].getlist('propertyImages'):
-				print("------------2-------------------")
-				property_image_name = secure_filename(upload.filename)
-				print(property_image_name)
-				print("---------------3----------------")
-				destination = "/".join([target, property_image_name])
-				print("------------------4-------------")
-				upload.save(destination)
-				print("--------------5-----------------")
+			# for upload in request.files['file'].getlist('propertyImages'):
+			print("------------2-------------------")
+			property_image_name = secure_filename(file.filename)
+			print(property_image_name)
+			print("---------------3----------------")
+			destination = "/".join([target, property_image_name])
+			print("------------------4-------------")
+			file.save(destination)
+			print("--------------5-----------------")
 			property_data['propertyImages'] = property_image_name
 			print("---------------6----------------")
 			print(property_data)
