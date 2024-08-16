@@ -33,7 +33,7 @@ userdb = client['FlaskDB']
 users = userdb.users
 properties = userdb.properties
 # properties = userdb.properties
-fs = gridfs.GridFS(properties)
+fs = gridfs.GridFS(userdb)
 
 otp_status = ''
 
@@ -308,7 +308,7 @@ def property_save():
 			property_image_name = secure_filename(file.filename)
 			print(property_image_name)
 			print("---------------3----------------")
-			destination = "/".join([target, property_image_name])
+			# destination = "/".join([target, property_image_name])
 			print("------------------4-------------")
 			# s = file.save(destination)
 			 # Save the file to MongoDB using GridFS
