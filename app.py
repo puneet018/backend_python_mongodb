@@ -37,11 +37,11 @@ fs = gridfs.GridFS(userdb)
 
 otp_status = ''
 
-# Set the environment variable to point to your service account key file
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account-file.json"
+# # Set the environment variable to point to your service account key file
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account-file.json"
 
-# Initialize a Cloud Storage client
-client = storage.Client()
+# # Initialize a Cloud Storage client
+# client = storage.Client()
 
 
 # Custom JSON Encoder to handle ObjectId
