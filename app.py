@@ -13,6 +13,8 @@ from bson import json_util
 # import jwt
 # from flask_sqlalchemy import SQLAlchemy
 # from functools import wraps
+# from google.cloud import storage
+import gridfs
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -31,8 +33,15 @@ userdb = client['FlaskDB']
 users = userdb.users
 properties = userdb.properties
 # properties = userdb.properties
+fs = gridfs.GridFS(properties)
 
 otp_status = ''
+
+# Set the environment variable to point to your service account key file
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account-file.json"
+
+# Initialize a Cloud Storage client
+client = storage.Client()
 
 
 # Custom JSON Encoder to handle ObjectId
@@ -264,6 +273,7 @@ def save_user_details():
 
 # Store property data 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+# real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	# property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
@@ -300,9 +310,11 @@ def property_save():
 			print("---------------3----------------")
 			destination = "/".join([target, property_image_name])
 			print("------------------4-------------")
-			s = file.save(destination)
-			print(s,"--------------5-----------------")
-			property_data['propertyImages'] = property_image_name
+			# s = file.save(destination)
+			 # Save the file to MongoDB using GridFS
+			file_id = fs.put(file, filename=property_image_name)
+			print(file_id,"--------------5-----------------")
+			property_data['propertyImagesId'] = file_id
 			print("---------------6----------------")
 			print(property_data)
 			_id = properties.insert_one(property_data)
@@ -317,6 +329,19 @@ def property_save():
 	else:
 		return jsonify({"status": 404, "message":"data not available"})
 
+
+def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_file_name = "local/path/to/file"
+    # destination_blob_name = "storage-object-name"
+
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    blob.upload_from_filename(source_file_name)
+
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
 
 
 # Get properties data 
