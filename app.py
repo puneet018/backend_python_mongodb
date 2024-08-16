@@ -300,8 +300,8 @@ def property_save():
 			print("---------------3----------------")
 			destination = "/".join([target, property_image_name])
 			print("------------------4-------------")
-			file.save(destination)
-			print("--------------5-----------------")
+			s = file.save(destination)
+			print(s,"--------------5-----------------")
 			property_data['propertyImages'] = property_image_name
 			print("---------------6----------------")
 			print(property_data)
