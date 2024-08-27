@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, session, jsonify, make_response, url_for
+from flask import Flask, request, Response, session, jsonify, make_response, url_for, send_file
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo , pymongo
 from twilio.rest import Client
@@ -15,6 +15,8 @@ from bson import json_util
 # from functools import wraps
 # from google.cloud import storage
 import gridfs
+import base64
+import io
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -276,86 +278,60 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
 @app.route('/property_save', methods=['POST'])
 def property_save():
-	# property_data = {'propDes': request.form.get('propDes'),'propName':request.form.get('propName'), 'propType':request.form.get('propType')}
-	# property_data = request.get_json()
-	# print('--------get_json')
-	# print(property_data)
-	# print('--------get')
 	property_data = request.form.get('json')
-	print('--------file')
-	print(request.files)
-	# property_data['images':request.files]
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
-		print(property_data)
-		# try:
-		target = os.path.join(APP_ROOT, 'property-images')  #folder path
-		if not os.path.isdir(target):
-				os.mkdir(target)     # create folder if not exits
-		# Access file data
-		print('--------propertyImages')
-		print('file' in request.files)
-		file = request.files['file']
-		print(file.filename)
+		try:
+			# Access file data
+			file = request.files['file']
+			if 'file' in request.files:
+				property_image_name = secure_filename(file.filename)
+				file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
+				property_data['propertyImagesId'] = file_id
+				_id = properties.insert_one(property_data)
+				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+			else:
+				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
 
-		print('------------------------------------propertyImages')
-		if 'file' in request.files:
-			# property_image_name = []
-			# i = 0
-			print("--------------1-----------------")
-			# for upload in request.files['file'].getlist('propertyImages'):
-			print("------------2-------------------")
-			property_image_name = secure_filename(file.filename)
-			print(property_image_name)
-			print("---------------3----------------")
-			# destination = "/".join([target, property_image_name])
-			print("------------------4-------------")
-			# s = file.save(destination)
-			 # Save the file to MongoDB using GridFS
-			file_id = fs.put(file, filename=property_image_name)
-			print(file_id,"--------------5-----------------")
-			property_data['propertyImagesId'] = file_id
-			print("---------------6----------------")
-			print(property_data)
-			_id = properties.insert_one(property_data)
-			print("----------------7---------------")
-			response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
-		else:
-			response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
-
-		# except (BaseException) as e:
-		# 	response_data = jsonify({"status": 404, "message": str(e)})
+		except (BaseException) as e:
+			response_data = jsonify({"status": 404, "message": str(e)})
 		return response_data
 	else:
 		return jsonify({"status": 404, "message":"data not available"})
 
 
-def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
-    """Uploads a file to the bucket."""
-    # bucket_name = "your-bucket-name"
-    # source_file_name = "local/path/to/file"
-    # destination_blob_name = "storage-object-name"
+# def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
+#     """Uploads a file to the bucket."""
+#     # bucket_name = "your-bucket-name"
+#     # source_file_name = "local/path/to/file"
+#     # destination_blob_name = "storage-object-name"
 
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
+#     bucket = client.bucket(bucket_name)
+#     blob = bucket.blob(destination_blob_name)
 
-    blob.upload_from_filename(source_file_name)
+#     blob.upload_from_filename(source_file_name)
 
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+#     print(f"File {source_file_name} uploaded to {destination_blob_name}.")
 
 
 # Get properties data 
 @app.route('/properties_get', methods=['GET'])
 def properties_get():
 	
-	try:
+	# try:
 		properties_data = JSONEncoder().encode([prop for prop in properties.find({})])
 		jdata = json.loads(properties_data)
-		print(len(jdata))
-		# find_user = users.find_one({"id":email})
-		return jsonify({'status': 200, 'data': json.loads(properties_data)})
-	except (BaseException) as e:
-	 	return jsonify({"status": 404, "message": str(e)})
+		for pd in jdata: 
+			json_data = properties.find_one({'_id': json_util.ObjectId(pd["_id"])})
+			
+			file = fs.get(json_data['propertyImagesId'])
+			file_content = file.read()
+			file_base64 = base64.b64encode(file_content).decode('utf-8')
+			pd['image_file'] = file_base64
+		return jsonify({'status': 200, 'data': jdata})
+	# except (BaseException) as e:
+	 	# return jsonify({"status": 404, "message": str(e)})
+
 
 
 # Get properties data 
@@ -430,51 +406,6 @@ def delete_user(user_id):
     global data
     data = [u for u in data if u['id'] != user_id]
     return '', 204
-
-
-# @app.route('/upload', methods=['POST'])
-# def upload():
-#     print("Request files:", request.files)
-#     print("Request form:", request.form)
-
-#     json_data = request.form.get('json')
-#     if json_data:
-#         json_data = json.loads(json_data)
-#         print("JSON data received:", json_data)
-
-#     if 'file' not in request.files:
-#         return jsonify({"error": "No file part in the request"}), 400
-
-#     file = request.files['file']
-#     if file.filename == '':
-#         return jsonify({"error": "No selected file"}), 400
-
-#     if file:
-#         filename = secure_filename(file.filename)
-#         file.save(os.path.join(app.config['property-images'], filename))
-# 		property_image_name = secure_filename(upload.filename)
-# 		destination = "/".join([target, property_image_name])
-# 		upload.save(destination)
-#     	return jsonify({"message": "File successfully uploaded"}), 200
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
