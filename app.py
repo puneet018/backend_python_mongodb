@@ -328,6 +328,19 @@ def properties_get():
 			file_content = file.read()
 			file_base64 = base64.b64encode(file_content).decode('utf-8')
 			pd['image_file'] = file_base64
+			pd['imgage_content_type'] = file.content_type
+			pd['file_name'] = file.filename
+
+		#  response_data = {
+        #     "filename": file_data['filename'],
+        #     "content_type": file_data['content_type'],
+        #     "file": file_base64,  # Base64 encoded image
+        #     "additional_data": {
+        #         # Include any other relevant data
+        #         "description": file_data.get('description', 'No description'),
+        #         "uploaded_at": file_data.get('uploaded_at', 'Unknown'),
+        #     }
+        # }
 		return jsonify({'status': 200, 'data': jdata})
 	# except (BaseException) as e:
 	 	# return jsonify({"status": 404, "message": str(e)})
