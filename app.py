@@ -279,17 +279,22 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/property_save', methods=['POST'])
 def property_save():
 	property_data = request.form.get('json')
+	file_ids = []
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
 		try:
 			# Access file data
-			file = request.files['file']
-			if 'file' in request.files:
-				property_image_name = secure_filename(file.filename)
-				file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
-				property_data['propertyImagesId'] = file_id
-				_id = properties.insert_one(property_data)
-				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+			# file = request.files['file']
+			files = request.files.getlist('files')
+			if 'files' in request.files:
+				print(files,"============")
+				for file in files:
+					if file.filename == '':
+						property_image_name = secure_filename(file.filename)
+						file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
+						_id = properties.insert_one(property_data)
+						response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+				property_data['propertyImagesId'] = file_ids
 			else:
 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
 
@@ -345,8 +350,6 @@ def properties_get():
 	# except (BaseException) as e:
 	 	# return jsonify({"status": 404, "message": str(e)})
 
-
-
 # Get properties data 
 @app.route('/properties_get/<int:property_id>', methods=['GET'])
 def property_get(property_id):
@@ -355,7 +358,6 @@ def property_get(property_id):
 	except (BaseException) as e:
 		response_data = jsonify({"status": 404, "message": str(e)})
 	return response_data
-
 
 # Delete Properties data 
 @app.route('/property_delete/<int:property_id>', methods=['GET'])
@@ -375,22 +377,18 @@ def property_delete(property_id):
 # 	except (BaseException) as e:
 # 		response_data = jsonify({"status": 404, "message": str(e)})
 # 	return response_data
-
-
 # Route to update a user by ID
+
 @app.route('/property_update/<int:propertyId>', methods=['PUT'])
 def property_update(propertyId):
     property = next((p for p in properties if p['id'] == propertyId), None)
 	# print(property)	
     if property:
-		
         updates = request.get_json()
         property.update(updates)
         return jsonify(property)
     else:
-		
         return jsonify({'error': 'User not found'}), 404
-
 
 # Route to get a user by ID
 @app.route('/users/<int:user_id>', methods=['GET'])
@@ -400,7 +398,6 @@ def get_user(user_id):
         return jsonify(user)
     else:
         return jsonify({'error': 'User not found'}), 404
-
 
 # Route to update a user by ID
 @app.route('/users/<int:user_id>', methods=['PUT'])
@@ -419,7 +416,6 @@ def delete_user(user_id):
     global data
     data = [u for u in data if u['id'] != user_id]
     return '', 204
-
 
 if __name__ == '__main__':
     app.run(debug=True)
