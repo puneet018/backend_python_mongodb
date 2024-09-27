@@ -335,7 +335,7 @@ def properties_get():
 			pd['image_file'] = file_base64
 			pd['imgage_content_type'] = file.content_type
 			pd['file_name'] = file.filename
-
+		print(jdata,"============")
 		#  response_data = {
         #     "filename": file_data['filename'],
         #     "content_type": file_data['content_type'],
