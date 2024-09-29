@@ -278,7 +278,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
 @app.route('/property_save', methods=['POST'])
 def property_save():
-	print('===============In Property save================')
+	print('===============In Property save Multi================')
 	property_data = request.form.get('json')
 	file_ids = []
 	if property_data:
