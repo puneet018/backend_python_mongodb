@@ -286,7 +286,7 @@ def property_save():
 		try:
 			# Access file data
 			# file = request.files['file']
-			files = request.files.getlist('files')
+			files = request.files.getlist('file')
 			print(files,'================ if out')
 			if 'files' in request.files:
 				print(files,"============")
