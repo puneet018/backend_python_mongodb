@@ -273,37 +273,6 @@ def save_user_details():
 
 
 
-# # Store property data 
-# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-# # real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
-# @app.route('/property_save', methods=['POST'])
-# def property_save():
-# 	property_data = request.form.get('json')
-# 	file_ids = []
-# 	if property_data:
-# 		property_data = json.loads(property_data) # parse the JSON string
-# 		try:
-# 			# Access file data
-# 			# file = request.files['file']
-# 			files = request.files.getlist('files')
-# 			if 'files' in request.files:
-# 				print(files,"============")
-# 				for file in files:
-# 					if file.filename == '':
-# 						property_image_name = secure_filename(file.filename)
-# 						file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
-# 						_id = properties.insert_one(property_data)
-# 						response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
-# 				property_data['propertyImagesId'] = file_ids
-# 			else:
-# 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
-
-# 		except (BaseException) as e:
-# 			response_data = jsonify({"status": 404, "message": str(e)})
-# 		return response_data
-# 	else:
-# 		return jsonify({"status": 404, "message":"data not available"})
-
 # Store property data 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
@@ -311,17 +280,22 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 def property_save():
 	print('===============In Property save================')
 	property_data = request.form.get('json')
+	file_ids = []
 	if property_data:
 		property_data = json.loads(property_data) # parse the JSON string
 		try:
 			# Access file data
-			file = request.files['file']
-			if 'file' in request.files:
-				property_image_name = secure_filename(file.filename)
-				file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
-				property_data['propertyImagesId'] = file_id
-				_id = properties.insert_one(property_data)
-				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+			# file = request.files['file']
+			files = request.files.getlist('files')
+			if 'files' in request.files:
+				print(files,"============")
+				for file in files:
+					if file.filename == '':
+						property_image_name = secure_filename(file.filename)
+						file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
+						_id = properties.insert_one(property_data)
+						response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+				property_data['propertyImagesId'] = file_ids
 			else:
 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
 
@@ -330,6 +304,33 @@ def property_save():
 		return response_data
 	else:
 		return jsonify({"status": 404, "message":"data not available"})
+
+# # Store property data 
+# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+# # real-estate-images-storage@real-estate-management-0011.iam.gserviceaccount.com
+# @app.route('/property_save', methods=['POST'])
+# def property_save():
+# 	print('===============In Property save================')
+# 	property_data = request.form.get('json')
+# 	if property_data:
+# 		property_data = json.loads(property_data) # parse the JSON string
+# 		try:
+# 			# Access file data
+# 			file = request.files['file']
+# 			if 'file' in request.files:
+# 				property_image_name = secure_filename(file.filename)
+# 				file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
+# 				property_data['propertyImagesId'] = file_id
+# 				_id = properties.insert_one(property_data)
+# 				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+# 			else:
+# 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
+
+# 		except (BaseException) as e:
+# 			response_data = jsonify({"status": 404, "message": str(e)})
+# 		return response_data
+# 	else:
+# 		return jsonify({"status": 404, "message":"data not available"})
 
 
 
