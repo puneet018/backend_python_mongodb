@@ -287,15 +287,17 @@ def property_save():
 			# Access file data
 			# file = request.files['file']
 			files = request.files.getlist('files')
+			print(files,'================ if out')
 			if 'files' in request.files:
 				print(files,"============")
 				for file in files:
 					if file.filename == '':
 						property_image_name = secure_filename(file.filename)
 						file_id = fs.put(file, filename=property_image_name, content_type = file.content_type)
-						_id = properties.insert_one(property_data)
-						response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
+						file_ids.append(file_id)
 				property_data['propertyImagesId'] = file_ids
+				_id = properties.insert_one(property_data)
+				response_data = jsonify({'status': 200, 'status_msg': 'Data saved'})
 			else:
 				response_data = jsonify({'status': 200, 'status_msg': 'Image is not save', 'data': property_data})
 
